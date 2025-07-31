@@ -1,0 +1,229 @@
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+class ApiService {
+  constructor() {
+    this.baseURL = API_BASE_URL;
+  }
+
+  // Get auth token from localStorage
+  getAuthToken() {
+    return localStorage.getItem('yalacarves_token');
+  }
+
+  // Create headers with auth token
+  getHeaders(includeAuth = true) {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+
+    if (includeAuth) {
+      const token = this.getAuthToken();
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+    }
+
+    return headers;
+  }
+
+  // Generic request method
+  async request(endpoint, options = {}) {
+    const url = `${this.baseURL}${endpoint}`;
+
+    const config = {
+      headers: this.getHeaders(options.auth !== false),
+      ...options,
+    };
+
+    try {
+      const response = await fetch(url, config);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('API request failed:', error);
+      throw error;
+    }
+  }
+
+  // Authentication
+  async login(email, password) {
+    const response = await this.request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+      auth: false
+    });
+
+    if (response.token) {
+      localStorage.setItem('yalacarves_token', response.token);
+      localStorage.setItem('yalacarves_user', JSON.stringify(response.user));
+    }
+
+    return response;
+  }
+
+  async register(name, email, password, securityQuestion, securityAnswer) {
+    const response = await this.request('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password, securityQuestion, securityAnswer }),
+      auth: false
+    });
+
+    if (response.token) {
+      localStorage.setItem('yalacarves_token', response.token);
+      localStorage.setItem('yalacarves_user', JSON.stringify(response.user));
+    }
+
+    return response;
+  }
+
+  async logout() {
+    localStorage.removeItem('yalacarves_token');
+    localStorage.removeItem('yalacarves_user');
+  }
+
+  async getProfile() {
+    return this.request('/auth/profile');
+  }
+
+  async updateProfile(data) {
+    return this.request('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  }
+
+  // Products
+  async getProducts(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return this.request(`/products${query ? `?${query}` : ''}`, { auth: false });
+  }
+
+  async getProduct(id) {
+    return this.request(`/products/${id}`, { auth: false });
+  }
+
+  async createProduct(productData) {
+    return this.request('/products', {
+      method: 'POST',
+      body: JSON.stringify(productData)
+    });
+  }
+
+  async updateProduct(id, productData) {
+    return this.request(`/products/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(productData)
+    });
+  }
+
+  async deleteProduct(id) {
+    return this.request(`/products/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Categories
+  async getCategories() {
+    return this.request('/categories', { auth: false });
+  }
+
+  async createCategory(categoryData) {
+    return this.request('/admin/categories', {
+      method: 'POST',
+      body: JSON.stringify(categoryData)
+    });
+  }
+
+  // Cart
+  async getCart() {
+    return this.request('/cart');
+  }
+
+  async addToCart(productId, quantity = 1) {
+    return this.request('/cart/add', {
+      method: 'POST',
+      body: JSON.stringify({ productId, quantity })
+    });
+  }
+
+  async updateCartItem(itemId, quantity) {
+    return this.request(`/cart/item/${itemId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ quantity })
+    });
+  }
+
+  async removeFromCart(itemId) {
+    return this.request(`/cart/item/${itemId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async clearCart() {
+    return this.request('/cart/clear', {
+      method: 'DELETE'
+    });
+  }
+
+  // Orders
+  async createOrder(orderData) {
+    return this.request('/orders', {
+      method: 'POST',
+      body: JSON.stringify(orderData)
+    });
+  }
+
+  async getMyOrders() {
+    return this.request('/orders/my-orders');
+  }
+
+  async getOrder(id) {
+    return this.request(`/orders/${id}`);
+  }
+
+  // Admin
+  async getDashboardStats() {
+    return this.request('/admin/dashboard/stats');
+  }
+
+  async getAllOrders(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return this.request(`/orders/admin/all${query ? `?${query}` : ''}`);
+  }
+
+  async updateOrderStatus(id, status, paymentStatus) {
+    return this.request(`/orders/admin/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, paymentStatus })
+    });
+  }
+
+  async getAllUsers(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return this.request(`/admin/users${query ? `?${query}` : ''}`);
+  }
+
+  async getInventoryLogs(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return this.request(`/admin/inventory/logs${query ? `?${query}` : ''}`);
+  }
+
+  async bulkUpdateStock(updates) {
+    return this.request('/admin/inventory/bulk-update', {
+      method: 'POST',
+      body: JSON.stringify({ updates })
+    });
+  }
+
+  // Health check
+  async healthCheck() {
+    return this.request('/health', { auth: false });
+  }
+}
+
+export default new ApiService();

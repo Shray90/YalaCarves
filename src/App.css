@@ -1,0 +1,412 @@
+/* App.css - Now using Tailwind CSS classes */
+
+/* Keep only essential global styles that can't be handled by Tailwind */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap");
+
+/* Custom animations that can't be easily replicated with Tailwind */
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .animate-logo-spin {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+/* Custom utility classes for complex gradients and effects */
+.bg-radial-gradient-circle-at-20-80-from-yellow-400\/10-to-transparent-50 {
+  background: radial-gradient(circle at 20% 80%, rgba(250, 204, 21, 0.1) 0%, transparent 50%);
+}
+
+.bg-radial-gradient-circle-at-80-20-from-yellow-400\/5-to-transparent-50 {
+  background: radial-gradient(circle at 80% 20%, rgba(250, 204, 21, 0.05) 0%, transparent 50%);
+}
+
+.bg-gradient-to-45deg-from-yellow-500-via-transparent-to-yellow-500 {
+  background: linear-gradient(45deg, #eab308, transparent, #eab308);
+}
+
+.bg-gradient-to-45deg-from-yellow-500-to-red-600 {
+  background: linear-gradient(45deg, #eab308, #dc2626);
+}
+
+.bg-gradient-to-br-from-white\/10-to-white\/5 {
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+}
+
+.bg-gradient-to-br-from-yellow-500-to-red-600 {
+  background: linear-gradient(to bottom right, #eab308, #dc2626);
+}
+
+.bg-gradient-to-r-from-transparent-via-yellow-400\/40-to-transparent {
+  background: linear-gradient(to right, transparent, rgba(250, 204, 21, 0.4), transparent);
+}
+
+.bg-gradient-to-r-from-transparent-via-white\/30-to-transparent {
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+.bg-gradient-to-r-from-amber-200\/20-via-transparent-to-amber-200\/20 {
+  background: linear-gradient(to right, rgba(251, 191, 36, 0.2), transparent, rgba(251, 191, 36, 0.2));
+}
+
+.bg-gradient-to-br-from-amber-700-via-amber-800-to-amber-900 {
+  background: linear-gradient(to bottom right, #b45309, #92400e, #78350f);
+}
+
+.bg-gradient-to-br-from-white\/10-to-transparent {
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.1), transparent);
+}
+
+.bg-gradient-to-t-from-transparent-via-transparent-to-white\/10 {
+  background: linear-gradient(to top, transparent, transparent, rgba(255, 255, 255, 0.1));
+}
+
+.bg-gradient-to-r-from-yellow-500-via-amber-600-to-red-600 {
+  background: linear-gradient(to right, #eab308, #d97706, #dc2626);
+}
+
+.bg-gradient-to-r-from-amber-100-to-amber-200 {
+  background: linear-gradient(to right, #fef3c7, #fde68a);
+}
+
+.bg-gradient-to-r-from-amber-200-to-amber-300 {
+  background: linear-gradient(to right, #fde68a, #fcd34d);
+}
+
+.bg-gradient-to-b-from-amber-50-to-amber-100 {
+  background: linear-gradient(to bottom, #fffbeb, #fef3c7);
+}
+
+.bg-gradient-to-r-from-yellow-500-to-amber-600 {
+  background: linear-gradient(to right, #eab308, #d97706);
+}
+
+.bg-gradient-to-b-from-yellow-500-to-amber-600 {
+  background: linear-gradient(to bottom, #eab308, #d97706);
+}
+
+/* Animation utilities */
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom border utilities */
+.border-3 {
+  border-width: 3px;
+}
+
+/* Custom shadow utilities */
+.shadow-3xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Custom transition utilities */
+.transition-left {
+  transition-property: left;
+}
+
+/* Custom transform utilities */
+.-translate-y-1 {
+  transform: translateY(-0.25rem);
+}
+
+/* Custom z-index utilities */
+.z-10 {
+  z-index: 10;
+}
+
+/* Custom backdrop utilities */
+.backdrop-blur-xl {
+  backdrop-filter: blur(24px);
+}
+
+/* Custom opacity utilities */
+.opacity-5 {
+  opacity: 0.05;
+}
+
+/* Custom scale utilities */
+.scale-95 {
+  transform: scale(0.95);
+}
+
+.scale-100 {
+  transform: scale(1);
+}
+
+.scale-110 {
+  transform: scale(1.1);
+}
+
+/* Custom width utilities */
+.w-3\/4 {
+  width: 75%;
+}
+
+/* Custom height utilities */
+.h-0\.5 {
+  height: 0.125rem;
+}
+
+.h-1\.5 {
+  height: 0.375rem;
+}
+
+/* Custom positioning utilities */
+.-inset-1 {
+  top: -0.25rem;
+  right: -0.25rem;
+  bottom: -0.25rem;
+  left: -0.25rem;
+}
+
+.-top-0\.5 {
+  top: -0.125rem;
+}
+
+.-left-0\.5 {
+  left: -0.125rem;
+}
+
+.-right-0\.5 {
+  right: -0.125rem;
+}
+
+.-bottom-0\.5 {
+  bottom: -0.125rem;
+}
+
+.-top-2 {
+  top: -0.5rem;
+}
+
+.-right-2 {
+  right: -0.5rem;
+}
+
+.-left-full {
+  left: -100%;
+}
+
+/* Custom spacing utilities */
+.gap-10 {
+  gap: 2.5rem;
+}
+
+.gap-12 {
+  gap: 3rem;
+}
+
+/* Custom text utilities */
+.tracking-widest {
+  letter-spacing: 0.1em;
+}
+
+.tracking-wide {
+  letter-spacing: 0.025em;
+}
+
+/* Custom font utilities */
+.font-serif {
+  font-family: 'Playfair Display', serif;
+}
+
+/* Custom color utilities */
+.text-amber-600 {
+  color: #d97706;
+}
+
+.text-amber-700 {
+  color: #b45309;
+}
+
+.text-amber-800 {
+  color: #92400e;
+}
+
+.text-amber-900 {
+  color: #78350f;
+}
+
+.text-amber-950 {
+  color: #451a03;
+}
+
+.text-yellow-400 {
+  color: #facc15;
+}
+
+.text-yellow-500 {
+  color: #eab308;
+}
+
+.text-red-600 {
+  color: #dc2626;
+}
+
+.text-red-700 {
+  color: #b91c1c;
+}
+
+.text-amber-50 {
+  color: #fffbeb;
+}
+
+.text-amber-100 {
+  color: #fef3c7;
+}
+
+.text-amber-200 {
+  color: #fde68a;
+}
+
+.text-amber-300 {
+  color: #fcd34d;
+}
+
+.text-amber-400 {
+  color: #fbbf24;
+}
+
+.text-amber-500 {
+  color: #f59e0b;
+}
+
+/* Background color utilities */
+.bg-amber-50 {
+  background-color: #fffbeb;
+}
+
+.bg-amber-100 {
+  background-color: #fef3c7;
+}
+
+.bg-amber-200 {
+  background-color: #fde68a;
+}
+
+.bg-amber-300 {
+  background-color: #fcd34d;
+}
+
+.bg-amber-600 {
+  background-color: #d97706;
+}
+
+.bg-amber-700 {
+  background-color: #b45309;
+}
+
+.bg-amber-800 {
+  background-color: #92400e;
+}
+
+.bg-amber-900 {
+  background-color: #78350f;
+}
+
+.bg-amber-950 {
+  background-color: #451a03;
+}
+
+.bg-yellow-400 {
+  background-color: #facc15;
+}
+
+.bg-yellow-500 {
+  background-color: #eab308;
+}
+
+.bg-red-600 {
+  background-color: #dc2626;
+}
+
+.bg-red-700 {
+  background-color: #b91c1c;
+}
+
+/* Border color utilities */
+.border-amber-200\/50 {
+  border-color: rgba(251, 191, 36, 0.5);
+}
+
+.border-amber-300\/20 {
+  border-color: rgba(252, 211, 77, 0.2);
+}
+
+.border-white\/10 {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.border-white\/20 {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.border-yellow-500 {
+  border-color: #eab308;
+}
+
+/* Text color utilities with opacity */
+.text-white\/80 {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.text-white\/90 {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.text-white\/70 {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Background color utilities with opacity */
+.bg-white\/5 {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.bg-white\/10 {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.bg-amber-200\/50 {
+  background-color: rgba(251, 191, 36, 0.5);
+}
+
+.bg-amber-300\/20 {
+  background-color: rgba(252, 211, 77, 0.2);
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .md\:flex {
+    display: flex;
+  }
+  
+  .md\:hidden {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .sm\:flex {
+    display: flex;
+  }
+}

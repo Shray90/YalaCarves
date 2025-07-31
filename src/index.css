@@ -1,0 +1,131 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /**
+   * Tailwind CSS theme
+   * tailwind.config.ts expects the following color variables to be expressed as HSL values.
+   * A different format will require also updating the theme in tailwind.config.ts.
+  */
+  :root {
+    --background: 45 15% 98%;
+    --foreground: 30 15% 15%;
+
+    --card: 45 15% 99%;
+    --card-foreground: 30 15% 15%;
+
+    --popover: 45 15% 99%;
+    --popover-foreground: 30 15% 15%;
+
+    --primary: 35 60% 45%;
+    --primary-foreground: 45 15% 98%;
+
+    --secondary: 35 25% 90%;
+    --secondary-foreground: 30 15% 25%;
+
+    --muted: 35 20% 94%;
+    --muted-foreground: 30 10% 55%;
+
+    --accent: 35 30% 88%;
+    --accent-foreground: 30 15% 25%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 35 20% 85%;
+    --input: 35 20% 85%;
+    --ring: 35 60% 45%;
+
+    --radius: 0.5rem;
+
+    /* Wood color palette */
+    --wood-50: 35 50% 95%;
+    --wood-100: 35 40% 88%;
+    --wood-200: 35 35% 80%;
+    --wood-300: 35 30% 70%;
+    --wood-400: 35 35% 60%;
+    --wood-500: 35 40% 50%;
+    --wood-600: 35 45% 40%;
+    --wood-700: 35 50% 30%;
+    --wood-800: 35 55% 20%;
+    --wood-900: 35 60% 15%;
+
+    /* Nepali flag inspired colors */
+    --nepal-gold: 45 100% 50%;
+    --nepal-red: 348 100% 40%;
+    --nepal-blue: 210 100% 25%;
+
+    --sidebar-background: 45 20% 96%;
+    --sidebar-foreground: 30 15% 25%;
+    --sidebar-primary: 35 60% 45%;
+    --sidebar-primary-foreground: 45 15% 98%;
+    --sidebar-accent: 35 25% 90%;
+    --sidebar-accent-foreground: 30 15% 25%;
+    --sidebar-border: 35 20% 85%;
+    --sidebar-ring: 35 60% 45%;
+  }
+
+  .dark {
+    --background: 30 25% 8%;
+    --foreground: 45 15% 95%;
+
+    --card: 30 25% 10%;
+    --card-foreground: 45 15% 95%;
+
+    --popover: 30 25% 10%;
+    --popover-foreground: 45 15% 95%;
+
+    --primary: 35 60% 55%;
+    --primary-foreground: 30 25% 8%;
+
+    --secondary: 30 20% 18%;
+    --secondary-foreground: 45 15% 85%;
+
+    --muted: 30 20% 18%;
+    --muted-foreground: 45 10% 65%;
+
+    --accent: 30 25% 22%;
+    --accent-foreground: 45 15% 85%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 45 15% 95%;
+
+    --border: 30 20% 25%;
+    --input: 30 20% 25%;
+    --ring: 35 60% 55%;
+
+    /* Dark wood colors */
+    --wood-50: 30 20% 25%;
+    --wood-100: 30 25% 22%;
+    --wood-200: 30 30% 20%;
+    --wood-300: 30 35% 18%;
+    --wood-400: 30 40% 16%;
+    --wood-500: 30 45% 14%;
+    --wood-600: 30 50% 12%;
+    --wood-700: 30 55% 10%;
+    --wood-800: 30 60% 8%;
+    --wood-900: 30 65% 6%;
+
+    --sidebar-background: 30 25% 12%;
+    --sidebar-foreground: 45 15% 85%;
+    --sidebar-primary: 35 60% 55%;
+    --sidebar-primary-foreground: 30 25% 8%;
+    --sidebar-accent: 30 20% 18%;
+    --sidebar-accent-foreground: 45 15% 85%;
+    --sidebar-border: 30 20% 25%;
+    --sidebar-ring: 35 60% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
