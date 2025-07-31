@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import Header from "./Header.jsx";
+import Header from "./Header";
 import Footer from "./Footer";
 
 interface LayoutProps {

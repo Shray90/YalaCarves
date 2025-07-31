@@ -18,11 +18,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { getProductById, products } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 import { formatPrice } from "@/utils/currency";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { addItem } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
 
@@ -46,6 +48,14 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
       addItem(product);
+    }
+  };
+
+  const toggleWishlist = () => {
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
     }
   };
 
@@ -118,15 +128,15 @@ const ProductDetail = () => {
             {/* Price */}
             <div className="flex items-center space-x-3">
               <span className="text-3xl font-bold text-foreground">
-                ${product.price}
+                Rs {product.price}
               </span>
               {product.originalPrice > product.price && (
                 <>
                   <span className="text-xl text-muted-foreground line-through">
-                    ${product.originalPrice}
+                    Rs {product.originalPrice}
                   </span>
                   <Badge variant="destructive">
-                    Save ${product.originalPrice - product.price}
+                    Save Rs{product.originalPrice - product.price}
                   </Badge>
                 </>
               )}
@@ -191,8 +201,16 @@ const ProductDetail = () => {
                   <ShoppingCart className="w-5 h-5 mr-2" />
                   Add to Cart
                 </Button>
-                <Button variant="outline" size="lg">
-                  <Heart className="w-5 h-5" />
+                <Button
+                  variant={isInWishlist(product.id) ? "destructive" : "outline"}
+                  size="lg"
+                  onClick={toggleWishlist}
+                >
+                  <Heart
+                    className="w-5 h-5"
+                    fill={isInWishlist(product.id) ? "red" : "none"}
+                    stroke="currentColor"
+                  />
                 </Button>
                 <Button variant="outline" size="lg">
                   <Share2 className="w-5 h-5" />
