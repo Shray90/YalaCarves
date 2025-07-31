@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, ShoppingBag, Search, User, Heart } from "lucide-react";
+import { Menu, X, ShoppingBag, Search, User, Heart, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import SearchDialog from "@/components/SearchDialog";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { state: cartState } = useCart();
   const { state: wishlistState } = useWishlist();
+  const { user } = useAuth();
 
   const navigation = [
     { name: "Home", href: "/" },
@@ -108,47 +110,52 @@ const Header = () => {
                 className="relative group hover:bg-wood-100 transition-all duration-300"
                 asChild
               >
-                <Link to="/profile">
+                <Link to={user?.isAdmin ? "/admin/dashboard" : "/profile"}>
                   <div className="absolute inset-0 bg-gradient-to-r from-wood-200 to-wood-300 rounded-md opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
                   <User className="h-5 w-5 text-wood-600 group-hover:text-wood-800 transition-colors duration-300 relative z-10" />
                 </Link>
               </Button>
 
-              {/* Wishlist Button with Enhanced Badge */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative group hover:bg-wood-100 transition-all duration-300"
-                asChild
-              >
-                <Link to="/wishlist">
-                  <div className="absolute inset-0 bg-gradient-to-r from-wood-200 to-wood-300 rounded-md opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-                  <Heart className="h-5 w-5 text-wood-600 group-hover:text-wood-800 transition-colors duration-300 relative z-10" />
-                  {wishlistState.items.length > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-gradient-to-r from-nepal-red to-red-600 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold shadow-lg animate-pulse border-2 border-white">
-                      {wishlistState.items.length}
-                    </span>
-                  )}
-                </Link>
-              </Button>
+              {/* Conditionally render Wishlist and Cart for non-admin users */}
+              {!user?.isAdmin && (
+                <>
+                  {/* Wishlist Button with Enhanced Badge */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative group hover:bg-wood-100 transition-all duration-300"
+                    asChild
+                  >
+                    <Link to="/wishlist">
+                      <div className="absolute inset-0 bg-gradient-to-r from-wood-200 to-wood-300 rounded-md opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                      <Heart className="h-5 w-5 text-wood-600 group-hover:text-wood-800 transition-colors duration-300 relative z-10" />
+                      {wishlistState.items.length > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-gradient-to-r from-nepal-red to-red-600 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold shadow-lg animate-pulse border-2 border-white">
+                          {wishlistState.items.length}
+                        </span>
+                      )}
+                    </Link>
+                  </Button>
 
-              {/* Cart Button with Enhanced Badge */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative group hover:bg-wood-100 transition-all duration-300"
-                asChild
-              >
-                <Link to="/cart">
-                  <div className="absolute inset-0 bg-gradient-to-r from-wood-200 to-wood-300 rounded-md opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-                  <ShoppingBag className="h-5 w-5 text-wood-600 group-hover:text-wood-800 transition-colors duration-300 relative z-10" />
-                  {cartState.itemCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-gradient-to-r from-nepal-red to-red-600 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold shadow-lg animate-pulse border-2 border-white">
-                      {cartState.itemCount}
-                    </span>
-                  )}
-                </Link>
-              </Button>
+                  {/* Cart Button with Enhanced Badge */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative group hover:bg-wood-100 transition-all duration-300"
+                    asChild
+                  >
+                    <Link to="/cart">
+                      <div className="absolute inset-0 bg-gradient-to-r from-wood-200 to-wood-300 rounded-md opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                      <ShoppingBag className="h-5 w-5 text-wood-600 group-hover:text-wood-800 transition-colors duration-300 relative z-10" />
+                      {cartState.itemCount > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-gradient-to-r from-nepal-red to-red-600 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold shadow-lg animate-pulse border-2 border-white">
+                          {cartState.itemCount}
+                        </span>
+                      )}
+                    </Link>
+                  </Button>
+                </>
+              )}
 
               {/* Enhanced Mobile menu button */}
               <Button

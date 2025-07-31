@@ -27,7 +27,12 @@ const Login = () => {
     setIsLoading(false);
 
     if (result.success) {
-      navigate("/");
+      // Redirect based on user role
+      if (result.user?.isAdmin) {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/profile");
+      }
     } else {
       setError(result.error || "Login failed. Please try again.");
     }
@@ -41,7 +46,12 @@ const Login = () => {
     setIsLoading(false);
 
     if (result.success) {
-      navigate("/");
+      // Redirect based on user role
+      if (result.user?.isAdmin) {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/profile");
+      }
     } else {
       setError(result.error || "Admin login failed. Please try again.");
     }
