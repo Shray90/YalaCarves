@@ -241,6 +241,47 @@ router.get('/users', verifyToken, requireAdmin, async (req, res) => {
   }
 });
 
+// Update user info (admin only)
+router.put('/users/:id', verifyToken, requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { name, email, phone, is_admin } = req.body;
+  try {
+    const result = await pool.query(
+      `UPDATE users SET
+        name = $1,
+        email = $2,
+        phone = $3,
+        is_admin = $4,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $5
+      RETURNING id, name, email, phone, is_admin, created_at`,
+      [name, email, phone, is_admin, id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ success: true, user: result.rows[0] });
+  } catch (error) {
+    console.error('Admin update user error:', error);
+    res.status(500).json({ error: 'Server error updating user' });
+  }
+});
+
+// Delete user (admin only)
+router.delete('/users/:id', verifyToken, requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING id', [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Admin delete user error:', error);
+    res.status(500).json({ error: 'Server error deleting user' });
+  }
+});
+
 // Get inventory logs
 router.get('/inventory/logs', verifyToken, requireAdmin, async (req, res) => {
   try {

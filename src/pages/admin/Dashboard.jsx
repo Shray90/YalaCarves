@@ -25,13 +25,34 @@ const AdminDashboard = () => {
   });
 
   useEffect(() => {
-    // In a real app, you would fetch these stats from the API
-    setStats({
-      totalUsers: 156,
-      totalProducts: 12,
-      totalOrders: 89,
-      totalRevenue: 2500000
-    });
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('/api/dashboard/stats', {
+          headers: {
+            'Content-Type': 'application/json',
+            // Add authorization header if needed, e.g. Bearer token
+          },
+          credentials: 'include' // to send cookies if any
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch dashboard stats');
+        }
+        const data = await response.json();
+        if (data.success) {
+          setStats({
+            totalUsers: data.stats.overview.totalUsers,
+            totalProducts: data.stats.overview.totalProducts,
+            totalOrders: data.stats.overview.totalOrders,
+            totalRevenue: data.stats.overview.totalRevenue
+          });
+        } else {
+          console.error('Error fetching stats:', data.error);
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+      }
+    };
+    fetchStats();
   }, []);
 
   const handleLogout = () => {
@@ -139,21 +160,29 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Button className="w-full" variant="outline">
-                  <Package className="w-4 h-4 mr-2" />
-                  Manage Products
+                <Button className="w-full" variant="outline" asChild>
+                  <Link to="/admin/products" className="flex items-center justify-center">
+                    <Package className="w-4 h-4 mr-2" />
+                    Manage Products
+                  </Link>
                 </Button>
-                <Button className="w-full" variant="outline">
-                  <ShoppingCart className="w-4 h-4 mr-2" />
-                  View Orders
+                <Button className="w-full" variant="outline" asChild>
+                  <Link to="/admin/orders" className="flex items-center justify-center">
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    View Orders
+                  </Link>
                 </Button>
-                <Button className="w-full" variant="outline">
-                  <Users className="w-4 h-4 mr-2" />
-                  Manage Users
+                <Button className="w-full" variant="outline" asChild>
+                  <Link to="/admin/users" className="flex items-center justify-center">
+                    <Users className="w-4 h-4 mr-2" />
+                    Manage Users
+                  </Link>
                 </Button>
-                <Button className="w-full" variant="outline">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Settings
+                <Button className="w-full" variant="outline" asChild>
+                  <Link to="/admin/settings" className="flex items-center justify-center">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Settings
+                  </Link>
                 </Button>
               </div>
             </CardContent>

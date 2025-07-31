@@ -20,6 +20,10 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminContactMessages from "./pages/admin/ContactMessages";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./styles/globals.css";
+import ManageProducts from "./pages/admin/ManageProducts";
+import AdminUsers from "./pages/admin/Users";
+import AdminOrders from "./pages/admin/Orders";
+import AdminSettings from "./pages/admin/Settings";
 
 const App = () => (
   <BrowserRouter>
@@ -55,6 +59,38 @@ const App = () => (
                 element={
                   <ProtectedRoute requireAdmin>
                     <AdminContactMessages />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/products"
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <ManageProducts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/users"
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <AdminUsers />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/orders"
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <AdminOrders />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/settings"
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <AdminSettings />
                   </ProtectedRoute>
                 }
               />

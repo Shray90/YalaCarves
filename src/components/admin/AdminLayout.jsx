@@ -49,11 +49,6 @@ const AdminLayout = ({ children }) => {
       icon: MessageSquare,
     },
     {
-      name: "Analytics",
-      href: "/admin/analytics",
-      icon: BarChart3,
-    },
-    {
       name: "Settings",
       href: "/admin/settings",
       icon: Settings,

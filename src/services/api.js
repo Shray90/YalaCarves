@@ -108,17 +108,31 @@ class ApiService {
   }
 
   async createProduct(productData) {
-    return this.request('/products', {
+    const url = `${this.baseURL}/products`;
+    const token = this.getAuthToken();
+    const response = await fetch(url, {
       method: 'POST',
-      body: JSON.stringify(productData)
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(productData),
     });
+    return response.json();
   }
 
   async updateProduct(id, productData) {
-    return this.request(`/products/${id}`, {
+    const url = `${this.baseURL}/products/${id}`;
+    const token = this.getAuthToken();
+    const response = await fetch(url, {
       method: 'PUT',
-      body: JSON.stringify(productData)
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(productData),
     });
+    return response.json();
   }
 
   async deleteProduct(id) {
@@ -206,6 +220,19 @@ class ApiService {
   async getAllUsers(params = {}) {
     const query = new URLSearchParams(params).toString();
     return this.request(`/admin/users${query ? `?${query}` : ''}`);
+  }
+
+  async updateUser(id, userData) {
+    return this.request(`/admin/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData)
+    });
+  }
+
+  async deleteUser(id) {
+    return this.request(`/admin/users/${id}`, {
+      method: 'DELETE'
+    });
   }
 
   async getInventoryLogs(params = {}) {
