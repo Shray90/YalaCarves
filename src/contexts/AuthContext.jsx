@@ -1,7 +1,10 @@
+// Authentication context provider for user login, registration, and session management
+// Features JWT token handling, user role management, and persistent authentication state
 import { createContext, useContext, useState, useEffect } from "react";
 import apiService from "../services/api";
 import { toast } from "../hooks/use-toast";
 
+// AuthContext for managing user authentication state across the application
 const AuthContext = createContext();
 
 export const useAuth = () => {
