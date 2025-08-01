@@ -1,10 +1,11 @@
+// Admin product management with CRUD operations
 import React, { useState, useEffect } from "react";
-import { 
-  Package, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Search, 
+import {
+  Package,
+  Plus,
+  Edit,
+  Trash2,
+  Search,
   Filter,
   Eye,
   Save,
