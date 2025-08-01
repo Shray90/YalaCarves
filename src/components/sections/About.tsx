@@ -1,5 +1,8 @@
+// About section component showcasing Yala Carves' heritage and craftsmanship values
+// Features master craftsmen stories, company values, and traditional woodworking legacy
 import { Check, Award, Users, Heart } from "lucide-react";
 
+// About component highlighting artisan heritage and sustainable practices
 const About = () => {
   const features = [
     {
