@@ -1,3 +1,5 @@
+// Checkout page component with secure payment processing and order management
+// Features address validation, payment methods, order summary, and COD support
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Lock, Truck, CreditCard, MapPin } from "lucide-react";
