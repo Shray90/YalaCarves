@@ -1,5 +1,8 @@
+// API service class for handling all HTTP requests to the Yala Carves backend
+// Features authentication, error handling, and comprehensive CRUD operations for e-commerce functionality
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// ApiService class providing centralized API communication with authentication and error handling
 class ApiService {
   constructor() {
     this.baseURL = API_BASE_URL;
