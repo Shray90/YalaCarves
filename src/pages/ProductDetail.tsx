@@ -1,3 +1,5 @@
+// Product detail page with comprehensive product information and purchase options
+// Features image gallery, quantity selection, wishlist integration, and related products
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
