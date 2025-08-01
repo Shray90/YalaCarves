@@ -1,6 +1,9 @@
+// About page component showcasing Yala Carves' heritage, mission, and artisan stories
+// Features company history, values, and commitment to traditional Nepali craftsmanship
 import Layout from "@/components/layout/Layout";
 import { Award, Users, Heart, Globe } from "lucide-react";
 
+// About component highlighting the company's legacy and cultural preservation mission
 const About = () => {
   return (
     <Layout>
