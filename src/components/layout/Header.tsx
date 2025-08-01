@@ -1,3 +1,5 @@
+// Main navigation header component for Yala Carves e-commerce application
+// Features responsive design, cart/wishlist integration, user authentication, and search functionality
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, ShoppingBag, Search, User, Heart, LayoutDashboard } from "lucide-react";
@@ -8,6 +10,7 @@ import SearchDialog from "@/components/SearchDialog";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
+// Header component with traditional Nepali design elements and modern functionality
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { state: cartState } = useCart();
