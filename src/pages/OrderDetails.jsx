@@ -1,3 +1,4 @@
+// Order Details page JavaScript version
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
