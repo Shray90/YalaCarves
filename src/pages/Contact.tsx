@@ -1,9 +1,12 @@
+// Contact page component with contact form and business information
+// Features contact form submission, location details, and customer support information
 import Layout from "@/components/layout/Layout";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
+// Contact component providing multiple ways for customers to reach Yala Carves
 const Contact = () => {
   return (
     <Layout>
