@@ -1,3 +1,5 @@
+// Order Success page component for confirming successful order placement
+// Features order confirmation details, next steps, and navigation to order tracking
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CheckCircle, Package, Truck, Eye, ArrowRight, CreditCard, Calendar } from "lucide-react";
