@@ -1,6 +1,9 @@
+// TypeScript Footer component for Yala Carves e-commerce platform
+// Features enhanced logo design with glass morphism effects and social media integration
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Twitter } from "lucide-react";
 
+// Footer component with TypeScript support and responsive design
 const Footer: React.FC = () => {
   return (
     <footer className="bg-[#6e4b2b] text-white py-10">
