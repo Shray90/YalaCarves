@@ -1,3 +1,5 @@
+// Featured Products section component for showcasing handcrafted masterpieces
+// Displays a curated selection of products with add-to-cart functionality and responsive grid layout
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, ShoppingCart } from "lucide-react";
@@ -7,6 +9,7 @@ import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/utils/currency";
 import api from "@/services/api";
 
+// FeaturedProducts component with API integration and cart functionality
 const FeaturedProducts = () => {
   const { addItem } = useCart();
   const [featuredProducts, setFeaturedProducts] = useState([]);
