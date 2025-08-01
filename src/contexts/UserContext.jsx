@@ -1,3 +1,4 @@
+// User context for profile management
 import { createContext, useContext, useReducer } from "react";
 
 const initialUser = {
