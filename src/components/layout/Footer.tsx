@@ -7,8 +7,9 @@ const Footer: React.FC = () => {
       <div className="flex flex-col items-center space-y-6">
 
         {/* Logo Box */}
-        <div className="border border-white px-6 py-2">
-          <h1 className="text-2xl font-serif tracking-wide">YALA CARVES</h1>
+        <div className="border-2 border-white px-16 py-6 bg-white/5 backdrop-blur-sm rounded-lg shadow-lg hover:bg-white/10 transition-all duration-300">
+          <h1 className="text-5xl lg:text-6xl font-serif tracking-wider font-bold text-white drop-shadow-lg">YALA CARVES</h1>
+          <p className="text-sm text-white/80 text-center mt-2 tracking-wide">Handcrafted Excellence</p>
         </div>
 
         {/* Social Icons */}

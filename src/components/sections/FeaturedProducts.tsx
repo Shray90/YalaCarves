@@ -1,14 +1,33 @@
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { products } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/utils/currency";
+import api from "@/services/api";
 
 const FeaturedProducts = () => {
   const { addItem } = useCart();
-  const featuredProducts = products.slice(0, 4);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        const response = await api.getProducts({ limit: 4 });
+        if (response.success) {
+          setFeaturedProducts(response.products || []);
+        }
+      } catch (error) {
+        console.error("Error fetching featured products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedProducts();
+  }, []);
 
   return (
     <section className="py-20 bg-background">
@@ -26,8 +45,13 @@ const FeaturedProducts = () => {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {featuredProducts.map((product, index) => (
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="text-lg">Loading featured products...</div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {featuredProducts.map((product, index) => (
             <Card
               key={product.id}
               className="group transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border border-border/50"
@@ -36,8 +60,12 @@ const FeaturedProducts = () => {
               <CardContent className="p-0">
                 {/* Product Image */}
                 <Link to={`/product/${product.id}`}>
-                  <div className="aspect-square bg-gradient-to-br from-wood-100 to-wood-200 flex items-center justify-center text-6xl rounded-t-lg group-hover:scale-105 transition-transform duration-300 cursor-pointer">
-                    {product.image}
+                  <div className="aspect-square bg-gradient-to-br from-wood-100 to-wood-200 rounded-t-lg overflow-hidden group-hover:scale-105 transition-transform duration-300 cursor-pointer">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 </Link>
 
@@ -77,8 +105,9 @@ const FeaturedProducts = () => {
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* CTA */}
         <div className="text-center">

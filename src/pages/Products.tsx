@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Search, Filter, Grid, List, ShoppingCart } from "lucide-react";
 import Layout from "@/components/layout/Layout";
@@ -13,9 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { products, categories } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/utils/currency";
+import api from "@/services/api";
 
 const Products = () => {
   const { addItem } = useCart();
@@ -25,6 +25,11 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("featured");
 
+  // State for backend data
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   // Handle URL search parameters
   useEffect(() => {
     const urlSearch = searchParams.get("search");
@@ -32,6 +37,44 @@ const Products = () => {
       setSearchQuery(urlSearch);
     }
   }, [searchParams]);
+
+  // Fetch products and categories from backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log('Fetching products and categories...');
+        const [productsRes, categoriesRes] = await Promise.all([
+          api.getProducts(),
+          api.getCategories(),
+        ]);
+
+        console.log('Products response:', productsRes);
+        console.log('Categories response:', categoriesRes);
+
+        if (productsRes.success) {
+          setProducts(productsRes.products || []);
+        }
+
+        if (categoriesRes.success) {
+          // Transform categories for the select component
+          const categoryOptions = [
+            { value: "all", label: "All Categories" },
+            ...categoriesRes.categories.map(cat => ({
+              value: cat.slug || cat.name.toLowerCase(),
+              label: cat.name
+            }))
+          ];
+          setCategories(categoryOptions);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const sortOptions = [
     { value: "featured", label: "Featured" },
@@ -68,7 +111,7 @@ const Products = () => {
     }
 
     return filtered;
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [products, searchQuery, selectedCategory, sortBy]);
 
   return (
     <Layout>
@@ -151,15 +194,30 @@ const Products = () => {
           </p>
         </div>
 
-        {/* Products Grid */}
-        <div
-          className={
-            viewMode === "grid"
-              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-              : "space-y-6"
-          }
-        >
-          {filteredProducts.map((product, index) => (
+        {/* Loading State */}
+        {loading ? (
+          <div className="text-center py-16">
+            <div className="text-lg">Loading products...</div>
+          </div>
+        ) : (
+          <>
+            {/* Products Grid */}
+            <div
+              className={
+                viewMode === "grid"
+                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                  : "space-y-6"
+              }
+            >
+              {filteredProducts.length === 0 ? (
+                <div className="col-span-full text-center py-16">
+                  <div className="text-lg text-muted-foreground">No products found</div>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Try adjusting your search or filter criteria
+                  </p>
+                </div>
+              ) : (
+                filteredProducts.map((product, index) => (
             <Card
               key={product.id}
               className={`group transition-all duration-300 hover:shadow-lg border border-border/50 ${
@@ -257,15 +315,20 @@ const Products = () => {
                 )}
               </CardContent>
             </Card>
-          ))}
-        </div>
+                ))
+              )}
+            </div>
 
-        {/* Load More */}
-        <div className="text-center mt-12">
-          <Button variant="outline" size="lg">
-            Load More Products
-          </Button>
-        </div>
+            {/* Load More */}
+            {!loading && filteredProducts.length > 0 && (
+              <div className="text-center mt-12">
+                <Button variant="outline" size="lg">
+                  Load More Products
+                </Button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </Layout>
   );

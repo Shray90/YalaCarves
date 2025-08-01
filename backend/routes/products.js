@@ -59,9 +59,9 @@ router.get('/', [
 
     // Get products with category info
     const productsQuery = `
-      SELECT 
+      SELECT
         p.id, p.name, p.slug, p.description, p.price, p.original_price,
-        p.artisan, p.emoji, p.stock_quantity, p.created_at,
+        p.artisan, p.emoji, p.image_url, p.stock_quantity, p.created_at,
         c.name as category_name, c.slug as category_slug
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
@@ -89,6 +89,7 @@ router.get('/', [
       ...product,
       price: parseFloat(product.price),
       originalPrice: product.original_price ? parseFloat(product.original_price) : null,
+      image: product.image_url || product.emoji, // Use image_url if available, fallback to emoji
       inStock: product.stock_quantity > 0,
       category: product.category_slug || 'uncategorized'
     }));
@@ -121,9 +122,9 @@ router.get('/:identifier', async (req, res) => {
     const isNumeric = /^\d+$/.test(identifier);
     
     const query = `
-      SELECT 
+      SELECT
         p.id, p.name, p.slug, p.description, p.price, p.original_price,
-        p.artisan, p.emoji, p.stock_quantity, p.created_at, p.updated_at,
+        p.artisan, p.emoji, p.image_url, p.stock_quantity, p.created_at, p.updated_at,
         c.name as category_name, c.slug as category_slug
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
@@ -140,6 +141,7 @@ router.get('/:identifier', async (req, res) => {
       ...result.rows[0],
       price: parseFloat(result.rows[0].price),
       originalPrice: result.rows[0].original_price ? parseFloat(result.rows[0].original_price) : null,
+      image: result.rows[0].image_url || result.rows[0].emoji, // Use image_url if available, fallback to emoji
       inStock: result.rows[0].stock_quantity > 0,
       category: result.rows[0].category_slug || 'uncategorized'
     };

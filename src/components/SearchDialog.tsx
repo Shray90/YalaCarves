@@ -73,8 +73,12 @@ const SearchDialog = ({ children }: SearchDialogProps) => {
                         onClick={handleProductClick}
                         className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted transition-colors group"
                       >
-                        <div className="w-12 h-12 bg-gradient-to-br from-wood-100 to-wood-200 rounded-lg flex items-center justify-center text-lg group-hover:scale-105 transition-transform">
-                          {product.image}
+                        <div className="w-12 h-12 bg-gradient-to-br from-wood-100 to-wood-200 rounded-lg overflow-hidden group-hover:scale-105 transition-transform">
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center space-x-2 mb-1">

@@ -210,8 +210,8 @@ router.get('/users', verifyToken, requireAdmin, async (req, res) => {
     }
 
     const query = `
-      SELECT 
-        id, name, email, phone, is_admin, created_at,
+      SELECT
+        id, name, email, phone, is_admin, is_active, created_at, last_login,
         (SELECT COUNT(*) FROM orders WHERE user_id = users.id) as order_count,
         (SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE user_id = users.id AND status != 'cancelled') as total_spent
       FROM users
@@ -225,7 +225,14 @@ router.get('/users', verifyToken, requireAdmin, async (req, res) => {
     const result = await pool.query(query, queryParams);
 
     const users = result.rows.map(user => ({
-      ...user,
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      isAdmin: user.is_admin,
+      isActive: user.is_active !== false, // Default to true if null
+      createdAt: user.created_at,
+      lastLogin: user.last_login,
       orderCount: parseInt(user.order_count),
       totalSpent: parseFloat(user.total_spent)
     }));
@@ -241,26 +248,108 @@ router.get('/users', verifyToken, requireAdmin, async (req, res) => {
   }
 });
 
+// Create new user (admin only)
+router.post('/users', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const { name, email, phone, password, isAdmin, isActive } = req.body;
+
+    // Validate required fields
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: 'Name, email, and password are required' });
+    }
+
+    // Check if user already exists
+    const existingUser = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ error: 'User with this email already exists' });
+    }
+
+    // Hash password
+    const bcrypt = require('bcryptjs');
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
+    const result = await pool.query(
+      `INSERT INTO users (name, email, phone, password, is_admin, is_active)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id, name, email, phone, is_admin, is_active, created_at`,
+      [name, email, phone || null, hashedPassword, isAdmin || false, isActive !== false]
+    );
+
+    const newUser = result.rows[0];
+
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      user: {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        phone: newUser.phone,
+        isAdmin: newUser.is_admin,
+        isActive: newUser.is_active,
+        createdAt: newUser.created_at
+      }
+    });
+
+  } catch (error) {
+    console.error('Create user error:', error);
+    res.status(500).json({ error: 'Server error creating user' });
+  }
+});
+
 // Update user info (admin only)
 router.put('/users/:id', verifyToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
-  const { name, email, phone, is_admin } = req.body;
+  const { name, email, phone, isAdmin, isActive, is_admin, is_active, password } = req.body;
+
   try {
-    const result = await pool.query(
-      `UPDATE users SET
-        name = $1,
-        email = $2,
-        phone = $3,
-        is_admin = $4,
-        updated_at = CURRENT_TIMESTAMP
-      WHERE id = $5
-      RETURNING id, name, email, phone, is_admin, created_at`,
-      [name, email, phone, is_admin, id]
-    );
+    // Handle both camelCase and snake_case field names for compatibility
+    const adminStatus = isAdmin !== undefined ? isAdmin : is_admin;
+    const activeStatus = isActive !== undefined ? isActive : is_active;
+
+    let updateQuery = `UPDATE users SET
+      name = $1,
+      email = $2,
+      phone = $3,
+      is_admin = $4,
+      is_active = $5,
+      updated_at = CURRENT_TIMESTAMP`;
+
+    let queryParams = [name, email, phone, adminStatus, activeStatus];
+
+    // If password is provided, hash it and include in update
+    if (password) {
+      const bcrypt = require('bcryptjs');
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updateQuery += `, password = $6`;
+      queryParams.push(hashedPassword);
+    }
+
+    updateQuery += ` WHERE id = $${queryParams.length + 1} RETURNING id, name, email, phone, is_admin, is_active, created_at`;
+    queryParams.push(id);
+
+    const result = await pool.query(updateQuery, queryParams);
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
-    res.json({ success: true, user: result.rows[0] });
+
+    const updatedUser = result.rows[0];
+
+    res.json({
+      success: true,
+      message: 'User updated successfully',
+      user: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        isAdmin: updatedUser.is_admin,
+        isActive: updatedUser.is_active,
+        createdAt: updatedUser.created_at
+      }
+    });
   } catch (error) {
     console.error('Admin update user error:', error);
     res.status(500).json({ error: 'Server error updating user' });

@@ -72,22 +72,12 @@ const Hero = () => {
           {/* Hero Image */}
           <div className="relative animate-slide-in">
             <div className="relative z-10">
-              <div className="aspect-square bg-gradient-to-br from-wood-200 to-wood-300 rounded-2xl p-8 shadow-2xl">
-                <div className="w-full h-full bg-gradient-to-br from-wood-400 to-wood-600 rounded-xl flex items-center justify-center text-wood-50">
-                  <div className="text-center space-y-4">
-                    <div className="w-24 h-24 mx-auto bg-wood-700 rounded-full flex items-center justify-center">
-                      <span className="text-3xl">🪵</span>
-                    </div>
-                    <div>
-                      <div className="text-lg font-semibold">
-                        Traditional Carving
-                      </div>
-                      <div className="text-sm opacity-80">
-                        Handcrafted Excellence
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <div className="aspect-square bg-gradient-to-br from-wood-200 to-wood-300 rounded-2xl overflow-hidden shadow-2xl">
+                <img
+                  src="/src/components/pictures/homepage.png"
+                  alt="Traditional Nepali Wood Carving"
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
 

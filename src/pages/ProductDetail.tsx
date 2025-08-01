@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -16,10 +16,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { getProductById, products } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { formatPrice } from "@/utils/currency";
+import api from "@/services/api";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -27,8 +27,53 @@ const ProductDetail = () => {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
+  const [product, setProduct] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const product = getProductById(Number(id));
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!id) return;
+
+      try {
+        console.log('Fetching product with ID:', id);
+        const response = await api.getProduct(id);
+        console.log('Product response:', response);
+
+        if (response.success) {
+          setProduct(response.product);
+
+          // Fetch related products from the same category
+          const relatedResponse = await api.getProducts({
+            category: response.product.category,
+            limit: 4
+          });
+
+          if (relatedResponse.success) {
+            // Filter out the current product from related products
+            const filtered = relatedResponse.products.filter(p => p.id !== parseInt(id));
+            setRelatedProducts(filtered.slice(0, 4));
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching product:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-16 text-center">
+          <div className="text-lg">Loading product...</div>
+        </div>
+      </Layout>
+    );
+  }
 
   if (!product) {
     return (
@@ -59,9 +104,7 @@ const ProductDetail = () => {
     }
   };
 
-  const relatedProducts = products
-    .filter((p) => p.category === product.category && p.id !== product.id)
-    .slice(0, 4);
+
 
   return (
     <Layout>
@@ -95,8 +138,12 @@ const ProductDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           {/* Product Image */}
           <div className="space-y-4">
-            <div className="aspect-square bg-gradient-to-br from-wood-100 to-wood-200 rounded-2xl flex items-center justify-center text-8xl shadow-lg">
-              {product.image}
+            <div className="aspect-square bg-gradient-to-br from-wood-100 to-wood-200 rounded-2xl overflow-hidden shadow-lg">
+              <img
+                src={product.image}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
             </div>
 
             {/* Thumbnail Images */}
@@ -104,9 +151,13 @@ const ProductDetail = () => {
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="aspect-square bg-gradient-to-br from-wood-50 to-wood-100 rounded-lg flex items-center justify-center text-2xl cursor-pointer hover:shadow-md transition-shadow"
+                  className="aspect-square bg-gradient-to-br from-wood-50 to-wood-100 rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
                 >
-                  {product.image}
+                  <img
+                    src={product.image}
+                    alt={`${product.name} view ${i}`}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               ))}
             </div>
@@ -365,8 +416,12 @@ const ProductDetail = () => {
                 <Card key={relatedProduct.id} className="group cursor-pointer">
                   <Link to={`/product/${relatedProduct.id}`}>
                     <CardContent className="p-0">
-                      <div className="aspect-square bg-gradient-to-br from-wood-100 to-wood-200 flex items-center justify-center text-4xl rounded-t-lg group-hover:scale-105 transition-transform duration-300">
-                        {relatedProduct.image}
+                      <div className="aspect-square bg-gradient-to-br from-wood-100 to-wood-200 rounded-t-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                        <img
+                          src={relatedProduct.image}
+                          alt={relatedProduct.name}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <div className="p-4 space-y-2">
                         <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">

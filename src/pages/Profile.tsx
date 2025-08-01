@@ -360,8 +360,12 @@ const Profile = () => {
                       key={item.id}
                       className="border border-border rounded-lg p-4 space-y-3"
                     >
-                      <div className="aspect-square bg-gradient-to-br from-wood-100 to-wood-200 rounded-lg flex items-center justify-center text-4xl">
-                        {item.image}
+                      <div className="aspect-square bg-gradient-to-br from-wood-100 to-wood-200 rounded-lg overflow-hidden">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <div>
                         <h3 className="font-semibold">{item.name}</h3>

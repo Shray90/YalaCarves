@@ -106,8 +106,12 @@ const Cart = () => {
                         <div key={item.id}>
                           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                             {/* Product Image */}
-                            <div className="w-24 h-24 bg-gradient-to-br from-wood-100 to-wood-200 rounded-lg flex items-center justify-center text-3xl flex-shrink-0">
-                              {item.image}
+                            <div className="w-24 h-24 bg-gradient-to-br from-wood-100 to-wood-200 rounded-lg overflow-hidden flex-shrink-0">
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                className="w-full h-full object-cover"
+                              />
                             </div>
 
                             {/* Product Details */}
@@ -216,8 +220,12 @@ const Cart = () => {
                       {outOfStockItems.map((item, index) => (
                         <div key={item.id} className="opacity-60">
                           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                            <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center text-3xl flex-shrink-0">
-                              {item.image}
+                            <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                className="w-full h-full object-cover grayscale"
+                              />
                             </div>
                             <div className="flex-1 space-y-2">
                               <div>
@@ -393,8 +401,12 @@ const Cart = () => {
                           className="flex items-center space-x-3"
                         >
                           <Link to={`/product/${product.id}`}>
-                            <div className="w-12 h-12 bg-gradient-to-br from-wood-100 to-wood-200 rounded-lg flex items-center justify-center text-lg cursor-pointer hover:scale-105 transition-transform">
-                              {product.image}
+                            <div className="w-12 h-12 bg-gradient-to-br from-wood-100 to-wood-200 rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform">
+                              <img
+                                src={product.image}
+                                alt={product.name}
+                                className="w-full h-full object-cover"
+                              />
                             </div>
                           </Link>
                           <div className="flex-1">

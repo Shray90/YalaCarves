@@ -71,17 +71,13 @@ const About = () => {
 
           {/* Features */}
           <div className="space-y-8">
-            {/* Image placeholder */}
-            <div className="aspect-square bg-gradient-to-br from-wood-200 to-wood-400 rounded-2xl p-8 shadow-lg">
-              <div className="w-full h-full bg-gradient-to-br from-wood-500 to-wood-700 rounded-xl flex items-center justify-center text-wood-50">
-                <div className="text-center space-y-4">
-                  <div className="text-6xl">🏛️</div>
-                  <div className="text-lg font-semibold">
-                    Traditional Workshop
-                  </div>
-                  <div className="text-sm opacity-80">Patan, Nepal</div>
-                </div>
-              </div>
+            {/* Image */}
+            <div className="aspect-square bg-gradient-to-br from-wood-200 to-wood-400 rounded-2xl overflow-hidden shadow-lg">
+              <img
+                src="/src/components/pictures/homepage.png"
+                alt="Traditional Nepali Wood Carving Workshop"
+                className="w-full h-full object-cover"
+              />
             </div>
 
             {/* Feature Cards */}

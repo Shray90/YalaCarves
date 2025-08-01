@@ -253,6 +253,13 @@ class ApiService {
     return this.request(`/admin/users${query ? `?${query}` : ''}`);
   }
 
+  async createUser(userData) {
+    return this.request('/admin/users', {
+      method: 'POST',
+      body: JSON.stringify(userData)
+    });
+  }
+
   async updateUser(id, userData) {
     return this.request(`/admin/users/${id}`, {
       method: 'PUT',

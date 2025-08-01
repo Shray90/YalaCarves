@@ -255,8 +255,12 @@ const MyOrders = () => {
                           key={item.id}
                           className="flex items-center space-x-3 bg-muted/30 rounded-lg p-3"
                         >
-                          <div className="w-10 h-10 bg-gradient-to-br from-wood-100 to-wood-200 rounded-lg flex items-center justify-center text-lg flex-shrink-0">
-                            {item.product.emoji}
+                          <div className="w-10 h-10 bg-gradient-to-br from-wood-100 to-wood-200 rounded-lg overflow-hidden flex-shrink-0">
+                            <img
+                              src={item.product.image || item.product.emoji}
+                              alt={item.product.name}
+                              className="w-full h-full object-cover"
+                            />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="text-sm font-medium truncate">
