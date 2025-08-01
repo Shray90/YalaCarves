@@ -1,3 +1,4 @@
+// Layout component JavaScript version
 import Header from "./Header";
 import Footer from "./Footer";
 
