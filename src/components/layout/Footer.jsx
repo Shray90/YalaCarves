@@ -1,6 +1,9 @@
+// Footer component for the Yala Carves e-commerce application
+// Displays company branding, social media links, and navigation
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Twitter } from "lucide-react";
 
+// Main footer component with enhanced logo box and social media integration
 const Footer = () => {
   return (
     <footer className="bg-[#6e4b2b] text-white py-10">
