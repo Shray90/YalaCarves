@@ -1,3 +1,4 @@
+// Admin view orders page
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
