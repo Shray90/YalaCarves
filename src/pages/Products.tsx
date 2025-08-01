@@ -1,3 +1,5 @@
+// Products catalog page with advanced filtering, search, and sorting capabilities
+// Features responsive grid/list view, category filtering, price sorting, and cart integration
 import React, { useState, useMemo, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Search, Filter, Grid, List, ShoppingCart } from "lucide-react";
@@ -17,6 +19,7 @@ import { useCart } from "@/contexts/CartContext";
 import { formatPrice } from "@/utils/currency";
 import api from "@/services/api";
 
+// Products component with comprehensive product browsing and filtering functionality
 const Products = () => {
   const { addItem } = useCart();
   const [searchParams, setSearchParams] = useSearchParams();
