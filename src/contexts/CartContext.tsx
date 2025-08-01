@@ -1,3 +1,5 @@
+// Cart context provider for managing shopping cart state and operations
+// Features persistent cart storage, quantity management, and user authentication integration
 import { createContext, useContext, useReducer, useEffect, useState, ReactNode } from "react";
 import { useAuth } from "./AuthContext";
 import api from "@/services/api";
