@@ -1,3 +1,5 @@
+// Wishlist context provider for managing user's favorite products and saved items
+// Features persistent wishlist storage, item management, and user authentication integration
 import { createContext, useContext, useReducer, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 
