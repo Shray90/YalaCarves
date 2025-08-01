@@ -1,3 +1,4 @@
+// Customer testimonials section
 import { Star, Quote } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
