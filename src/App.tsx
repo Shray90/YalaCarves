@@ -1,3 +1,5 @@
+// Main App component for Yala Carves e-commerce application
+// Configures routing, context providers, and lazy loading for optimal performance
 import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
