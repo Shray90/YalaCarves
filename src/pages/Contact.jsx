@@ -1,3 +1,4 @@
+// Contact page JavaScript version
 import { useState } from "react";
 import { MapPin, Mail, Phone, Clock, Send } from "lucide-react";
 import Layout from "@/components/layout/Layout";
