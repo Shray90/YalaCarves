@@ -1,3 +1,4 @@
+// Product data for JavaScript version
 export const products = [
   {
     id: 1,
