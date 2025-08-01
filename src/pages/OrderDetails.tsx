@@ -1,12 +1,14 @@
+// Order Details page component for comprehensive order information and tracking
+// Features detailed order status, shipping information, and cancellation functionality
 import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { 
-  ArrowLeft, 
-  Package, 
-  Clock, 
-  Truck, 
-  CheckCircle, 
-  XCircle, 
+import {
+  ArrowLeft,
+  Package,
+  Clock,
+  Truck,
+  CheckCircle,
+  XCircle,
   MapPin,
   CreditCard,
   Calendar,
