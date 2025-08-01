@@ -1,3 +1,4 @@
+// My Orders page JavaScript version
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../services/api";
