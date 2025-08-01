@@ -1,6 +1,9 @@
+// Product data catalog for Yala Carves handcrafted wooden items
+// Features comprehensive product information including artisan details, pricing, and inventory status
 import { Product } from "@/contexts/CartContext";
 import ganeshImg from "@/components/pictures/ganesh.png";
 
+// Products array containing all available handcrafted items with detailed specifications
 export const products: Product[] = [
   {
     id: 1,
