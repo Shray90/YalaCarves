@@ -1,3 +1,5 @@
+// User Profile page component with account management and preferences
+// Features profile editing, order history, address management, and account settings
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
