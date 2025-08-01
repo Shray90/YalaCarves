@@ -76,7 +76,7 @@ const Hero = () => {
                 <div className="w-full h-full bg-gradient-to-br from-wood-400 to-wood-600 rounded-xl flex items-center justify-center text-wood-50">
                   <div className="text-center space-y-4">
                     <div className="w-24 h-24 mx-auto bg-wood-700 rounded-full flex items-center justify-center">
-                      <span className="text-3xl">🪵</span>
+                      <span className="text-3xl"> <img src="C:\Users\shilp\OneDrive\Desktop\Web Development\carvesyala\src\components\pictures\homepage.png" alt="Description" className="inline-block w-8 h-8" /></span>
                     </div>
                     <div>
                       <div className="text-lg font-semibold">

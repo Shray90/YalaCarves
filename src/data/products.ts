@@ -1,4 +1,5 @@
 import { Product } from "@/contexts/CartContext";
+import ganeshImg from "@/components/pictures/ganesh.png";
 
 export const products: Product[] = [
   {
@@ -6,7 +7,7 @@ export const products: Product[] = [
     name: "Traditional Ganesh Sculpture",
     price: 299,
     originalPrice: 350,
-    image: "🐘",
+    image: ganeshImg,
     category: "religious",
     description:
       "Beautifully hand-carved Ganesh statue crafted from premium teak wood. This traditional piece features intricate details and represents the remover of obstacles in Hindu tradition. Perfect for home temples, meditation spaces, or as a spiritual gift.",
@@ -19,10 +20,8 @@ export const products: Product[] = [
     name: "Nepali Window Panel",
     price: 489,
     originalPrice: 599,
-    image: "🪟",
+    image: "https://www.yala-carves.com/wp-content/uploads/2025/07/Nepali-Window-Panel-1.jpg",
     category: "architectural",
-    rating: 4.8,
-    reviews: 89,
     description:
       "Authentic Newari-style wooden window panel featuring traditional geometric patterns and floral motifs. Hand-carved using centuries-old techniques, this architectural piece brings the beauty of Kathmandu's heritage homes to your space.",
     artisan: "Master Sanu Kaji Shakya",
@@ -36,8 +35,6 @@ export const products: Product[] = [
     originalPrice: 240,
     image: "🧘",
     category: "spiritual",
-    rating: 4.9,
-    reviews: 203,
     description:
       "Serene Buddha statue in meditation pose, carved from sustainable sal wood. Features peaceful expression and traditional robes detail. Ideal for meditation rooms, gardens, or spiritual practice spaces.",
     artisan: "Master Raju Nakarmi",

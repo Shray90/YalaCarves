@@ -167,31 +167,29 @@ const Products = () => {
               }`}
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <CardContent
-                className={`p-0 ${viewMode === "list" ? "flex-1" : ""}`}
-              >
+              <CardContent className={`p-0 ${viewMode === "list" ? "flex-1" : ""}`}>
                 <div
                   className={
-                    viewMode === "list"
-                      ? "flex flex-col sm:flex-row"
-                      : "flex flex-col"
+                    viewMode === "list" ? "flex flex-col sm:flex-row" : "flex flex-col"
                   }
                 >
                   {/* Product Image */}
                   <Link to={`/product/${product.id}`}>
                     <div
-                      className={`bg-gradient-to-br from-wood-100 to-wood-200 flex items-center justify-center text-6xl group-hover:scale-105 transition-transform duration-300 cursor-pointer relative ${
+                      className={`bg-gradient-to-br from-wood-100 to-wood-200 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 cursor-pointer relative ${
                         viewMode === "list"
                           ? "sm:w-48 h-48 rounded-l-lg"
                           : "aspect-square rounded-t-lg"
                       }`}
                     >
-                      {product.image}
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="object-cover w-full h-full rounded-lg"
+                      />
                       {!product.inStock && (
                         <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-l-lg sm:rounded-t-lg">
-                          <span className="text-white font-semibold">
-                            Out of Stock
-                          </span>
+                          <span className="text-white font-semibold">Out of Stock</span>
                         </div>
                       )}
                     </div>
@@ -201,10 +199,7 @@ const Products = () => {
                   <div className="p-6 space-y-3 flex-1">
                     <div className="flex items-center justify-between">
                       <Badge variant="secondary" className="text-xs">
-                        {
-                          categories.find((c) => c.value === product.category)
-                            ?.label
-                        }
+                        {categories.find((c) => c.value === product.category)?.label}
                       </Badge>
                     </div>
 
@@ -215,9 +210,7 @@ const Products = () => {
                     </Link>
 
                     {viewMode === "list" && (
-                      <p className="text-sm text-muted-foreground">
-                        {product.description}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{product.description}</p>
                     )}
 
                     <div className="flex items-center space-x-2">
