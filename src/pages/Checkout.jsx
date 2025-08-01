@@ -1,3 +1,4 @@
+// Checkout page JavaScript version
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
