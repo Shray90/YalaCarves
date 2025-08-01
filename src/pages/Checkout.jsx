@@ -15,6 +15,7 @@ const Checkout = () => {
     name: "",
     address: "",
     city: "",
+    state: "",
     postalCode: "",
     phone: "",
   });
@@ -37,24 +38,43 @@ const Checkout = () => {
     e.preventDefault();
     setError(null);
     setLoading(true);
+
     try {
       const orderData = {
         items: cart.items.map((item) => ({
           productId: item.id,
           quantity: item.quantity,
         })),
-        shipping,
-        paymentMethod: payment.method,
+        shippingAddress: {
+          streetAddress: shipping.address,
+          city: shipping.city,
+          state: shipping.state || "",
+          postalCode: shipping.postalCode,
+          country: "India",
+        },
+        paymentMethod: "cash_on_delivery", // Fixed payment method
+        notes: null,
       };
+
+      console.log('Sending order data:', orderData);
       const res = await api.createOrder(orderData);
+      console.log('Order response:', res);
+
       if (res.success) {
         clearCart();
-        navigate("/order-success");
+        navigate("/order-success", {
+          state: {
+            orderNumber: res.order.orderNumber,
+            orderId: res.order.id
+          },
+        });
       } else {
+        console.error('Order failed:', res);
         setError(res.error || "Failed to place order");
       }
-    } catch {
-      setError("Error placing order");
+    } catch (err) {
+      console.error('Order error:', err);
+      setError(err.message || "Error placing order");
     } finally {
       setLoading(false);
     }
@@ -103,6 +123,12 @@ const Checkout = () => {
                 value={shipping.city}
                 onChange={handleInputChange}
                 required
+              />
+              <Input
+                name="state"
+                placeholder="State"
+                value={shipping.state}
+                onChange={handleInputChange}
               />
               <Input
                 name="postalCode"

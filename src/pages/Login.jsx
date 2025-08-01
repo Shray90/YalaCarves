@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { toast } from "../hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +28,10 @@ const Login = () => {
     setIsLoading(false);
 
     if (result.success) {
+      toast({
+        title: "Login successful!",
+        description: "You have successfully logged in.",
+      });
       // Redirect based on user role
       if (result.user?.isAdmin) {
         navigate("/admin/dashboard");
@@ -34,6 +39,11 @@ const Login = () => {
         navigate("/profile");
       }
     } else {
+      toast({
+        title: "Login failed",
+        description: result.error || "Login failed. Please try again.",
+        variant: "destructive",
+      });
       setError(result.error || "Login failed. Please try again.");
     }
   };
@@ -46,6 +56,10 @@ const Login = () => {
     setIsLoading(false);
 
     if (result.success) {
+      toast({
+        title: "Login successful!",
+        description: "You have successfully logged in as admin.",
+      });
       // Redirect based on user role
       if (result.user?.isAdmin) {
         navigate("/admin/dashboard");
@@ -53,6 +67,11 @@ const Login = () => {
         navigate("/profile");
       }
     } else {
+      toast({
+        title: "Admin login failed",
+        description: result.error || "Admin login failed. Please try again.",
+        variant: "destructive",
+      });
       setError(result.error || "Admin login failed. Please try again.");
     }
   };

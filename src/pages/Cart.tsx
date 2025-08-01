@@ -21,7 +21,7 @@ import { useCart } from "@/contexts/CartContext";
 import { products } from "@/data/products";
 
 const Cart = () => {
-  const { state, updateQuantity, removeItem } = useCart();
+  const { state, updateQuantity, removeItem, addItem } = useCart();
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
 
@@ -338,14 +338,16 @@ const Cart = () => {
                   )}
 
                   <div className="space-y-3">
-                    <Button
-                      className="w-full"
-                      size="lg"
-                      disabled={inStockItems.length === 0}
-                    >
-                      <Lock className="w-4 h-4 mr-2" />
-                      Proceed to Checkout
-                    </Button>
+                    <Link to="/checkout" className="block">
+                      <Button
+                        className="w-full"
+                        size="lg"
+                        disabled={inStockItems.length === 0}
+                      >
+                        <Lock className="w-4 h-4 mr-2" />
+                        Proceed to Checkout
+                      </Button>
+                    </Link>
                     <Link to="/products" className="block">
                       <Button variant="outline" className="w-full">
                         Continue Shopping

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { toast } from "../hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,8 +52,17 @@ const Signup = () => {
     setIsLoading(false);
 
     if (result.success) {
+      toast({
+        title: "Signup successful!",
+        description: "Your account has been created.",
+      });
       navigate("/");
     } else {
+      toast({
+        title: "Signup failed",
+        description: result.error || "Signup failed. Please try again.",
+        variant: "destructive",
+      });
       setError(result.error || "Signup failed. Please try again.");
     }
   };

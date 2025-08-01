@@ -21,6 +21,11 @@ import Signup from "./pages/Signup";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminDashboard from "./pages/admin/Dashboard";
 
+const Checkout = lazy(() => import("./pages/Checkout"));
+const OrderSuccess = lazy(() => import("./pages/OrderSuccess"));
+const MyOrders = lazy(() => import("./pages/MyOrders"));
+const OrderDetails = lazy(() => import("./pages/OrderDetails"));
+
 const ManageProducts = lazy(() => import("./pages/admin/ManageProducts"));
 const ViewOrders = lazy(() => import("./pages/admin/ViewOrders"));
 const ManageUsers = lazy(() => import("./pages/admin/ManageUsers"));
@@ -48,7 +53,49 @@ const App = () => (
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
-                
+
+                {/* Checkout and Order Routes */}
+                <Route
+                  path="/checkout"
+                  element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<div>Loading...</div>}>
+                        <Checkout />
+                      </Suspense>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/order-success"
+                  element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<div>Loading...</div>}>
+                        <OrderSuccess />
+                      </Suspense>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/my-orders"
+                  element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<div>Loading...</div>}>
+                        <MyOrders />
+                      </Suspense>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/orders/:id"
+                  element={
+                    <ProtectedRoute>
+                      <Suspense fallback={<div>Loading...</div>}>
+                        <OrderDetails />
+                      </Suspense>
+                    </ProtectedRoute>
+                  }
+                />
+
                 {/* Admin Routes */}
                 <Route 
                   path="/admin/dashboard" 

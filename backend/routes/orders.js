@@ -13,55 +13,105 @@ const generateOrderNumber = () => {
 };
 
 // Create new order
-router.post('/', verifyToken, [
-  body('shippingAddress').isObject().withMessage('Shipping address is required'),
-  body('shippingAddress.streetAddress').trim().notEmpty().withMessage('Street address is required'),
-  body('shippingAddress.city').trim().notEmpty().withMessage('City is required'),
-  body('shippingAddress.postalCode').trim().notEmpty().withMessage('Postal code is required'),
-  body('paymentMethod').isIn(['cash_on_delivery', 'bank_transfer']).withMessage('Valid payment method is required'),
-], async (req, res) => {
+router.post('/', verifyToken, async (req, res) => {
   const client = await pool.connect();
-  
+
   try {
     await client.query('BEGIN');
-    
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
+
+    console.log('Order request body:', req.body);
+    console.log('User:', req.user);
+
+    const { shippingAddress, billingAddress, paymentMethod, notes, items } = req.body;
+
+    console.log('Shipping address received:', shippingAddress);
+    console.log('Items received:', items);
+    console.log('Payment method received:', paymentMethod);
+
+    // Basic validation
+    if (!shippingAddress) {
+      console.log('ERROR: No shipping address provided');
       await client.query('ROLLBACK');
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ error: 'Shipping address is required' });
     }
 
-    const { shippingAddress, billingAddress, paymentMethod, notes } = req.body;
+    if (!shippingAddress.streetAddress) {
+      console.log('ERROR: No street address provided');
+      await client.query('ROLLBACK');
+      return res.status(400).json({ error: 'Street address is required' });
+    }
 
-    // Get user's cart items
-    const cartQuery = `
-      SELECT 
-        ci.product_id, ci.quantity,
-        p.name, p.price, p.stock_quantity, p.is_active
-      FROM cart_items ci
-      JOIN products p ON ci.product_id = p.id
-      WHERE ci.user_id = $1 AND p.is_active = TRUE
+    if (!shippingAddress.city) {
+      console.log('ERROR: No city provided');
+      await client.query('ROLLBACK');
+      return res.status(400).json({ error: 'City is required' });
+    }
+
+    if (!shippingAddress.postalCode) {
+      console.log('ERROR: No postal code provided');
+      await client.query('ROLLBACK');
+      return res.status(400).json({ error: 'Postal code is required' });
+    }
+
+    if (!paymentMethod || paymentMethod !== 'cash_on_delivery') {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ error: 'Valid payment method is required' });
+    }
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ error: 'Order items are required' });
+    }
+
+    // Validate and get product details for the items
+    const productIds = items.map(item => item.productId);
+    const productQuery = `
+      SELECT id, name, price, stock_quantity, is_active, emoji, slug
+      FROM products
+      WHERE id = ANY($1) AND is_active = TRUE
     `;
 
-    const cartResult = await client.query(cartQuery, [req.user.id]);
+    const productResult = await client.query(productQuery, [productIds]);
 
-    if (cartResult.rows.length === 0) {
+    if (productResult.rows.length !== items.length) {
       await client.query('ROLLBACK');
-      return res.status(400).json({ error: 'Cart is empty' });
+      return res.status(400).json({ error: 'Some products are not available' });
     }
 
-    // Validate stock availability
-    for (const item of cartResult.rows) {
-      if (item.stock_quantity < item.quantity) {
+    // Create a map of products for easy lookup
+    const productMap = {};
+    productResult.rows.forEach(product => {
+      productMap[product.id] = product;
+    });
+
+    // Validate stock and prepare cart items
+    const cartItems = [];
+    for (const item of items) {
+      const product = productMap[item.productId];
+      if (!product) {
         await client.query('ROLLBACK');
-        return res.status(400).json({ 
-          error: `Insufficient stock for ${item.name}. Only ${item.stock_quantity} available.` 
+        return res.status(400).json({ error: `Product with ID ${item.productId} not found` });
+      }
+
+      if (product.stock_quantity < item.quantity) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({
+          error: `Insufficient stock for ${product.name}. Only ${product.stock_quantity} available.`
         });
       }
+
+      cartItems.push({
+        product_id: item.productId,
+        quantity: item.quantity,
+        name: product.name,
+        price: product.price,
+        stock_quantity: product.stock_quantity,
+        is_active: product.is_active
+      });
     }
 
     // Calculate total amount
-    const totalAmount = cartResult.rows.reduce((sum, item) => 
+    const totalAmount = cartItems.reduce((sum, item) =>
       sum + (parseFloat(item.price) * item.quantity), 0
     );
 
@@ -107,7 +157,7 @@ router.post('/', verifyToken, [
     const order = orderResult.rows[0];
 
     // Create order items and update stock
-    for (const item of cartResult.rows) {
+    for (const item of cartItems) {
       // Create order item
       await client.query(`
         INSERT INTO order_items (order_id, product_id, quantity, price)
@@ -124,17 +174,16 @@ router.post('/', verifyToken, [
       // Log inventory change
       await client.query(`
         INSERT INTO inventory_logs (
-          product_id, change_type, quantity_change, 
+          product_id, change_type, quantity_change,
           previous_quantity, new_quantity, reason, changed_by
         ) VALUES ($1, 'sold', $2, $3, $4, $5, $6)
       `, [
-        item.product_id, -item.quantity, item.stock_quantity, 
+        item.product_id, -item.quantity, item.stock_quantity,
         newStock, `Order #${orderNumber}`, req.user.id
       ]);
     }
 
-    // Clear user's cart
-    await client.query('DELETE FROM cart_items WHERE user_id = $1', [req.user.id]);
+    // Note: We don't clear the database cart since we're using frontend cart
 
     await client.query('COMMIT');
 
@@ -393,6 +442,174 @@ router.put('/admin/:id/status', verifyToken, requireAdmin, [
   } catch (error) {
     console.error('Update order status error:', error);
     res.status(500).json({ error: 'Server error updating order status' });
+  }
+});
+
+const moment = require('moment');
+
+router.put('/:id/cancel', verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Get order to verify ownership and time
+    const orderResult = await pool.query(
+      'SELECT id, user_id, status, created_at FROM orders WHERE id = $1',
+      [id]
+    );
+
+    if (orderResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    const order = orderResult.rows[0];
+
+    if (order.user_id !== req.user.id) {
+      return res.status(403).json({ error: 'Unauthorized to cancel this order' });
+    }
+
+    if (order.status === 'cancelled') {
+      return res.status(400).json({ error: 'Order is already cancelled' });
+    }
+
+    const createdAt = moment(order.created_at);
+    const now = moment();
+
+    if (now.diff(createdAt, 'hours') > 5) {
+      return res.status(400).json({ error: 'Order can only be cancelled within 5 hours of placement' });
+    }
+
+    // Update order status to cancelled
+    const updateResult = await pool.query(
+      'UPDATE orders SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
+      ['cancelled', id]
+    );
+
+    res.json({
+      success: true,
+      message: 'Order cancelled successfully',
+      order: updateResult.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Cancel order error:', error);
+    res.status(500).json({ error: 'Server error cancelling order' });
+  }
+});
+
+// Update order (user can update shipping address, notes before confirmation)
+router.put('/:id', verifyToken, [
+  body('shippingAddress').optional().isObject(),
+  body('notes').optional().isString().trim()
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { id } = req.params;
+    const { shippingAddress, notes } = req.body;
+
+    // Check if order exists and belongs to user
+    const orderResult = await pool.query(
+      'SELECT id, user_id, status FROM orders WHERE id = $1',
+      [id]
+    );
+
+    if (orderResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    const order = orderResult.rows[0];
+
+    if (order.user_id !== req.user.id) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    if (order.status !== 'pending') {
+      return res.status(400).json({ error: 'Can only update pending orders' });
+    }
+
+    let updateQuery = 'UPDATE orders SET updated_at = CURRENT_TIMESTAMP';
+    let queryParams = [];
+    let paramIndex = 1;
+
+    if (shippingAddress) {
+      // Update shipping address
+      const addressResult = await pool.query(`
+        UPDATE addresses SET 
+          street_address = $1, city = $2, state = $3, 
+          postal_code = $4, country = $5, updated_at = CURRENT_TIMESTAMP
+        WHERE id = (SELECT shipping_address_id FROM orders WHERE id = $6)
+        RETURNING id
+      `, [
+        shippingAddress.streetAddress,
+        shippingAddress.city,
+        shippingAddress.state || null,
+        shippingAddress.postalCode,
+        shippingAddress.country || 'Pakistan',
+        id
+      ]);
+    }
+
+    if (notes !== undefined) {
+      updateQuery += `, notes = $${paramIndex++}`;
+      queryParams.push(notes);
+    }
+
+    updateQuery += ` WHERE id = $${paramIndex} RETURNING *`;
+    queryParams.push(id);
+
+    const result = await pool.query(updateQuery, queryParams);
+
+    res.json({
+      success: true,
+      message: 'Order updated successfully',
+      order: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Update order error:', error);
+    res.status(500).json({ error: 'Server error updating order' });
+  }
+});
+
+// Delete order (only cancelled or delivered orders)
+router.delete('/:id', verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if order exists and belongs to user
+    const orderResult = await pool.query(
+      'SELECT id, user_id, status FROM orders WHERE id = $1',
+      [id]
+    );
+
+    if (orderResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    const order = orderResult.rows[0];
+
+    if (order.user_id !== req.user.id) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    if (!['cancelled', 'delivered'].includes(order.status)) {
+      return res.status(400).json({ error: 'Can only delete cancelled or delivered orders' });
+    }
+
+    // Delete order (cascade will handle order_items)
+    await pool.query('DELETE FROM orders WHERE id = $1', [id]);
+
+    res.json({
+      success: true,
+      message: 'Order deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Delete order error:', error);
+    res.status(500).json({ error: 'Server error deleting order' });
   }
 });
 

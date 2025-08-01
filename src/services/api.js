@@ -40,12 +40,24 @@ class ApiService {
       const data = await response.json();
 
       if (!response.ok) {
+        console.error('API Error Response:', data);
+        console.error('Response Status:', response.status);
+        console.error('Response Headers:', response.headers);
+
+        // If there are validation errors, show them
+        if (data.errors && Array.isArray(data.errors)) {
+          const errorMessages = data.errors.map(err => err.msg).join(', ');
+          throw new Error(`Validation errors: ${errorMessages}`);
+        }
+
         throw new Error(data.error || `HTTP error! status: ${response.status}`);
       }
 
       return data;
     } catch (error) {
       console.error('API request failed:', error);
+      console.error('Request URL:', url);
+      console.error('Request config:', config);
       throw error;
     }
   }
@@ -198,6 +210,12 @@ class ApiService {
 
   async getOrder(id) {
     return this.request(`/orders/${id}`);
+  }
+
+  async cancelOrder(id) {
+    return this.request(`/orders/${id}/cancel`, {
+      method: 'PUT'
+    });
   }
 
   // Admin

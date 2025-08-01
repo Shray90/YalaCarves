@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import apiService from "../services/api";
+import { toast } from "../hooks/use-toast";
 
 const AuthContext = createContext();
 
@@ -69,6 +70,10 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("yalacarves_user");
     localStorage.removeItem("yalacarves_token");
     apiService.logout();
+    toast({
+      title: "Signed out",
+      description: "You have been signed out.",
+    });
   };
 
   const value = {
