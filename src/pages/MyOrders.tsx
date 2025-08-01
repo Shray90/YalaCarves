@@ -1,12 +1,14 @@
+// My Orders page component for displaying user's order history and tracking
+// Features order status tracking, cancellation options, and detailed order information
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { 
-  Package, 
-  Clock, 
-  Truck, 
-  CheckCircle, 
-  XCircle, 
-  Eye, 
+import {
+  Package,
+  Clock,
+  Truck,
+  CheckCircle,
+  XCircle,
+  Eye,
   AlertCircle,
   Calendar,
   CreditCard
