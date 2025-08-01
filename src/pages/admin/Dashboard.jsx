@@ -1,3 +1,4 @@
+// Admin dashboard with analytics and management overview
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
