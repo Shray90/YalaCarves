@@ -1,8 +1,11 @@
+// 404 Not Found page component with helpful navigation and woodworking theme
+// Features creative 404 design, navigation options, and helpful links for lost users
 import { Link } from "react-router-dom";
 import { Home, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
 
+// NotFound component with woodworking-themed 404 page and user-friendly navigation
 const NotFound = () => {
   return (
     <Layout>
