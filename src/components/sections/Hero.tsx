@@ -1,3 +1,4 @@
+// Hero section with main banner and CTA
 import { Link } from "react-router-dom";
 import { ArrowRight, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
