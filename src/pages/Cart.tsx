@@ -1,3 +1,5 @@
+// Shopping cart page component with comprehensive e-commerce functionality
+// Features item management, promo codes, shipping calculation, and secure checkout process
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -20,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/contexts/CartContext";
 import { products } from "@/data/products";
 
+// Cart component with advanced shopping cart features and user experience enhancements
 const Cart = () => {
   const { state, updateQuantity, removeItem, addItem } = useCart();
   const [promoCode, setPromoCode] = useState("");
