@@ -1,3 +1,4 @@
+// Old header component version
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, ShoppingBag, Search, User, LogIn, LogOut, Crown } from "lucide-react";
