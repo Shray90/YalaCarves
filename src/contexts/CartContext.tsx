@@ -1,4 +1,6 @@
-import { createContext, useContext, useReducer, ReactNode } from "react";
+import { createContext, useContext, useReducer, useEffect, useState, ReactNode } from "react";
+import { useAuth } from "./AuthContext";
+import api from "@/services/api";
 
 export interface Product {
   id: number;
@@ -27,7 +29,8 @@ type CartAction =
   | { type: "ADD_ITEM"; payload: Product }
   | { type: "REMOVE_ITEM"; payload: number }
   | { type: "UPDATE_QUANTITY"; payload: { id: number; quantity: number } }
-  | { type: "CLEAR_CART" };
+  | { type: "CLEAR_CART" }
+  | { type: "LOAD_CART"; payload: CartItem[] };
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
@@ -109,6 +112,14 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         itemCount: 0,
       };
 
+    case "LOAD_CART":
+      const loadedItems = action.payload;
+      return {
+        items: loadedItems,
+        total: loadedItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+        itemCount: loadedItems.reduce((sum, item) => sum + item.quantity, 0),
+      };
+
     default:
       return state;
   }
@@ -136,26 +147,153 @@ interface CartProviderProps {
   children: ReactNode;
 }
 
-export const CartProvider = ({ children }: CartProviderProps) => {
-  const [state, dispatch] = useReducer(cartReducer, {
+// Initialize cart from localStorage
+const getInitialCartState = (): CartState => {
+  try {
+    const savedCart = localStorage.getItem('yalacarves_cart');
+    if (savedCart) {
+      const cartItems = JSON.parse(savedCart);
+      console.log('Initializing cart from localStorage:', cartItems);
+      return {
+        items: cartItems,
+        total: cartItems.reduce((sum: number, item: CartItem) => sum + item.price * item.quantity, 0),
+        itemCount: cartItems.reduce((sum: number, item: CartItem) => sum + item.quantity, 0),
+      };
+    }
+  } catch (error) {
+    console.error('Failed to load cart from localStorage:', error);
+  }
+  return {
     items: [],
     total: 0,
     itemCount: 0,
-  });
+  };
+};
 
-  const addItem = (product: Product) => {
-    dispatch({ type: "ADD_ITEM", payload: product });
+export const CartProvider = ({ children }: CartProviderProps) => {
+  const { isAuthenticated, user } = useAuth();
+  const [state, dispatch] = useReducer(cartReducer, getInitialCartState());
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    console.log('Saving cart to localStorage:', state.items);
+    localStorage.setItem('yalacarves_cart', JSON.stringify(state.items));
+  }, [state.items]);
+
+  // Load cart from backend when user logs in
+  useEffect(() => {
+    console.log('Auth state changed:', { isAuthenticated, user: user?.id });
+    if (isAuthenticated && user) {
+      console.log('Loading cart for authenticated user:', user.id);
+      loadCartFromBackend();
+    }
+  }, [isAuthenticated, user]);
+
+  const loadCartFromBackend = async () => {
+    try {
+      console.log('Loading cart from backend...');
+      const response = await api.getCart();
+      console.log('Cart response:', response);
+
+      if (response.success && response.cart && response.cart.items) {
+        // Transform backend cart items to frontend format
+        const cartItems = response.cart.items.map((item: any) => ({
+          id: item.product.id,
+          name: item.product.name,
+          price: item.product.price,
+          originalPrice: item.product.price, // Backend doesn't have originalPrice
+          image: item.product.emoji,
+          category: item.product.category || '',
+          description: '', // Backend doesn't provide description in cart
+          artisan: '', // Backend doesn't provide artisan in cart
+          inStock: item.product.inStock,
+          stockQuantity: item.product.stockQuantity,
+          quantity: item.quantity,
+        }));
+        console.log('Transformed cart items:', cartItems);
+        dispatch({ type: "LOAD_CART", payload: cartItems });
+        // Also save to localStorage as backup
+        localStorage.setItem('yalacarves_cart', JSON.stringify(cartItems));
+      } else {
+        console.log('No cart items found or invalid response');
+        dispatch({ type: "LOAD_CART", payload: [] });
+        localStorage.setItem('yalacarves_cart', JSON.stringify([]));
+      }
+    } catch (error) {
+      console.error('Failed to load cart from backend:', error);
+      // Try to load from localStorage as fallback
+      try {
+        const savedCart = localStorage.getItem('yalacarves_cart');
+        if (savedCart) {
+          const cartItems = JSON.parse(savedCart);
+          console.log('Loaded cart from localStorage fallback:', cartItems);
+          dispatch({ type: "LOAD_CART", payload: cartItems });
+        }
+      } catch (localError) {
+        console.error('Failed to load cart from localStorage fallback:', localError);
+      }
+    }
   };
 
-  const removeItem = (id: number) => {
-    dispatch({ type: "REMOVE_ITEM", payload: id });
+  const addItem = async (product: Product) => {
+    if (isAuthenticated) {
+      try {
+        console.log('Adding item to backend cart:', product.id);
+        const response = await api.addToCart(product.id, 1);
+        console.log('Add to cart response:', response);
+        // Reload cart from backend to get updated state
+        loadCartFromBackend();
+      } catch (error) {
+        console.error('Failed to add item to backend cart:', error);
+        // Fallback to local state
+        dispatch({ type: "ADD_ITEM", payload: product });
+      }
+    } else {
+      // For non-authenticated users, just use local state
+      dispatch({ type: "ADD_ITEM", payload: product });
+    }
   };
 
-  const updateQuantity = (id: number, quantity: number) => {
-    dispatch({ type: "UPDATE_QUANTITY", payload: { id, quantity } });
+  const removeItem = async (productId: number) => {
+    if (isAuthenticated) {
+      try {
+        console.log('Removing product from cart:', productId);
+        await api.removeProductFromCart(productId);
+        loadCartFromBackend();
+      } catch (error) {
+        console.error('Failed to remove item from backend cart:', error);
+        // Fallback to local state
+        dispatch({ type: "REMOVE_ITEM", payload: productId });
+      }
+    } else {
+      dispatch({ type: "REMOVE_ITEM", payload: productId });
+    }
   };
 
-  const clearCart = () => {
+  const updateQuantity = async (productId: number, quantity: number) => {
+    if (isAuthenticated) {
+      try {
+        console.log('Updating product quantity:', productId, quantity);
+        await api.updateCartProduct(productId, quantity);
+        loadCartFromBackend();
+      } catch (error) {
+        console.error('Failed to update cart item in backend:', error);
+        // Fallback to local state
+        dispatch({ type: "UPDATE_QUANTITY", payload: { id: productId, quantity } });
+      }
+    } else {
+      dispatch({ type: "UPDATE_QUANTITY", payload: { id: productId, quantity } });
+    }
+  };
+
+  const clearCart = async () => {
+    if (isAuthenticated) {
+      try {
+        await api.clearCart();
+      } catch (error) {
+        console.error('Failed to clear backend cart:', error);
+      }
+    }
     dispatch({ type: "CLEAR_CART" });
   };
 

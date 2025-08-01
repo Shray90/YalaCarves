@@ -27,7 +27,7 @@ const MyOrders = lazy(() => import("./pages/MyOrders"));
 const OrderDetails = lazy(() => import("./pages/OrderDetails"));
 
 const ManageProducts = lazy(() => import("./pages/admin/ManageProducts"));
-const ViewOrders = lazy(() => import("./pages/admin/ViewOrders"));
+const OrderManagement = lazy(() => import("./pages/admin/OrderManagement"));
 const ManageUsers = lazy(() => import("./pages/admin/ManageUsers"));
 const Settings = lazy(() => import("./pages/admin/Settings"));
 
@@ -120,7 +120,7 @@ const App = () => (
                   element={
                     <ProtectedRoute requireAdmin={true}>
                       <Suspense fallback={<div>Loading...</div>}>
-                        <ViewOrders />
+                        <OrderManagement />
                       </Suspense>
                     </ProtectedRoute>
                   }

@@ -14,6 +14,7 @@ import {
   LogOut,
   ArrowLeft
 } from "lucide-react";
+import api from "../../services/api";
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -27,17 +28,10 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch('/api/dashboard/stats', {
-          headers: {
-            'Content-Type': 'application/json',
-            // Add authorization header if needed, e.g. Bearer token
-          },
-          credentials: 'include' // to send cookies if any
-        });
-        if (!response.ok) {
-          throw new Error('Failed to fetch dashboard stats');
-        }
-        const data = await response.json();
+        console.log('Fetching dashboard stats...');
+        const data = await api.getDashboardStats();
+        console.log('Dashboard stats response:', data);
+
         if (data.success) {
           setStats({
             totalUsers: data.stats.overview.totalUsers,
@@ -47,9 +41,23 @@ const AdminDashboard = () => {
           });
         } else {
           console.error('Error fetching stats:', data.error);
+          // Set default stats if API fails
+          setStats({
+            totalUsers: 0,
+            totalProducts: 0,
+            totalOrders: 0,
+            totalRevenue: 0
+          });
         }
       } catch (error) {
         console.error('Fetch error:', error);
+        // Set default stats if API fails
+        setStats({
+          totalUsers: 0,
+          totalProducts: 0,
+          totalOrders: 0,
+          totalRevenue: 0
+        });
       }
     };
     fetchStats();

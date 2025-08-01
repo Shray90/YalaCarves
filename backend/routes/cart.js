@@ -191,7 +191,62 @@ router.put('/item/:id', verifyToken, [
   }
 });
 
-// Remove item from cart
+// Update cart item quantity by product ID
+router.put('/product/:productId', verifyToken, [
+  body('quantity').isInt({ min: 1 }).withMessage('Quantity must be at least 1'),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { productId } = req.params;
+    const { quantity } = req.body;
+
+    // Check if cart item exists and belongs to user
+    const cartItemResult = await pool.query(`
+      SELECT ci.id, ci.product_id, p.name, p.stock_quantity, p.is_active
+      FROM cart_items ci
+      JOIN products p ON ci.product_id = p.id
+      WHERE ci.product_id = $1 AND ci.user_id = $2
+    `, [productId, req.user.id]);
+
+    if (cartItemResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Product not found in cart' });
+    }
+
+    const cartItem = cartItemResult.rows[0];
+
+    if (!cartItem.is_active) {
+      return res.status(400).json({ error: 'Product is no longer available' });
+    }
+
+    if (cartItem.stock_quantity < quantity) {
+      return res.status(400).json({
+        error: `Insufficient stock. Only ${cartItem.stock_quantity} items available.`
+      });
+    }
+
+    // Update quantity
+    const result = await pool.query(
+      'UPDATE cart_items SET quantity = $1, updated_at = CURRENT_TIMESTAMP WHERE product_id = $2 AND user_id = $3 RETURNING *',
+      [quantity, productId, req.user.id]
+    );
+
+    res.json({
+      success: true,
+      message: 'Cart updated successfully',
+      cartItem: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Update cart product error:', error);
+    res.status(500).json({ error: 'Server error updating cart product' });
+  }
+});
+
+// Remove item from cart by cart item ID
 router.delete('/item/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
@@ -213,6 +268,31 @@ router.delete('/item/:id', verifyToken, async (req, res) => {
   } catch (error) {
     console.error('Remove cart item error:', error);
     res.status(500).json({ error: 'Server error removing cart item' });
+  }
+});
+
+// Remove item from cart by product ID
+router.delete('/product/:productId', verifyToken, async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    const result = await pool.query(
+      'DELETE FROM cart_items WHERE product_id = $1 AND user_id = $2 RETURNING *',
+      [productId, req.user.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Product not found in cart' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Product removed from cart'
+    });
+
+  } catch (error) {
+    console.error('Remove product from cart error:', error);
+    res.status(500).json({ error: 'Server error removing product from cart' });
   }
 });
 

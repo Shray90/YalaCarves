@@ -5,6 +5,15 @@ const { verifyToken, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Test endpoint for debugging
+router.get('/test', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Orders API is working',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Generate order number
 const generateOrderNumber = () => {
   const timestamp = Date.now().toString();
@@ -360,16 +369,17 @@ router.get('/admin/all', verifyToken, requireAdmin, async (req, res) => {
       : '';
 
     const query = `
-      SELECT 
-        o.id, o.order_number, o.total_amount, o.status, 
+      SELECT
+        o.id, o.order_number, o.total_amount, o.status,
         o.payment_status, o.payment_method, o.created_at,
-        u.name as customer_name, u.email as customer_email,
+        u.id as user_id, u.name as customer_name, u.email as customer_email,
         COUNT(oi.id) as item_count
       FROM orders o
       JOIN users u ON o.user_id = u.id
       LEFT JOIN order_items oi ON o.id = oi.order_id
       ${whereClause}
-      GROUP BY o.id, u.name, u.email
+      GROUP BY o.id, o.order_number, o.total_amount, o.status, o.payment_status,
+               o.payment_method, o.created_at, u.id, u.name, u.email
       ORDER BY o.created_at DESC
       LIMIT $${paramIndex++} OFFSET $${paramIndex++}
     `;
@@ -377,16 +387,53 @@ router.get('/admin/all', verifyToken, requireAdmin, async (req, res) => {
     queryParams.push(parseInt(limit), offset);
 
     const result = await pool.query(query, queryParams);
+    console.log('Orders query result:', result.rows);
 
-    const orders = result.rows.map(order => ({
-      ...order,
-      totalAmount: parseFloat(order.total_amount),
-      itemCount: parseInt(order.item_count)
-    }));
+    // Get detailed order items for each order
+    const ordersWithItems = await Promise.all(
+      result.rows.map(async (order) => {
+        const itemsQuery = `
+          SELECT
+            oi.id, oi.quantity, oi.price,
+            p.id as product_id, p.name as product_name, p.emoji
+          FROM order_items oi
+          JOIN products p ON oi.product_id = p.id
+          WHERE oi.order_id = $1
+        `;
+        const itemsResult = await pool.query(itemsQuery, [order.id]);
+
+        return {
+          id: order.id,
+          orderNumber: order.order_number,
+          totalAmount: parseFloat(order.total_amount),
+          status: order.status,
+          paymentStatus: order.payment_status,
+          paymentMethod: order.payment_method,
+          createdAt: order.created_at,
+          user: {
+            id: order.user_id,
+            name: order.customer_name,
+            email: order.customer_email
+          },
+          items: itemsResult.rows.map(item => ({
+            id: item.id,
+            quantity: item.quantity,
+            price: parseFloat(item.price),
+            product: {
+              id: item.product_id,
+              name: item.product_name,
+              emoji: item.emoji
+            }
+          }))
+        };
+      })
+    );
+
+    console.log('Orders with items:', ordersWithItems);
 
     res.json({
       success: true,
-      orders
+      orders: ordersWithItems
     });
 
   } catch (error) {

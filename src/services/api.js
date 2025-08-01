@@ -184,8 +184,21 @@ class ApiService {
     });
   }
 
+  async updateCartProduct(productId, quantity) {
+    return this.request(`/cart/product/${productId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ quantity })
+    });
+  }
+
   async removeFromCart(itemId) {
     return this.request(`/cart/item/${itemId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async removeProductFromCart(productId) {
+    return this.request(`/cart/product/${productId}`, {
       method: 'DELETE'
     });
   }
