@@ -1,3 +1,5 @@
+// Wishlist page component for managing saved products and favorites
+// Features item removal, product details, and easy navigation to product pages
 import { Link } from "react-router-dom";
 import {
   Trash2,
@@ -11,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { formatPrice } from "@/utils/currency";
 
+// Wishlist component with saved products management functionality
 const Wishlist = () => {
   const { state, removeFromWishlist } = useWishlist();
 
