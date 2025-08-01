@@ -1,3 +1,4 @@
+// Cart context JavaScript version
 import { createContext, useContext, useReducer } from "react";
 
 const cartReducer = (state, action) => {
